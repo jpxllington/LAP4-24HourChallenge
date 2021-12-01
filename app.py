@@ -34,6 +34,12 @@ def index():
         return render_template("home.html")
     elif request.method == "POST":
         requestUrl = request.form['URL']
+        try:
+            existing = Website.query.filter_by(longUrl=requestUrl).first()
+            if existing.longUrl:
+                return render_template("home.html", shortUrl=existing.shortUrl)
+        except:
+            return ("<h1>Please enter a URL</h1>")
         shortUrl = shortuuid.uuid()[:10]
         site = Website(longUrl=requestUrl, shortUrl=shortUrl)
         print(site.longUrl)
@@ -46,34 +52,11 @@ def index():
 @app.route('/<string:shortUrl>', methods=["GET"])
 def lengthen(shortUrl):
     site = Website.query.filter_by(shortUrl=shortUrl).first()
-    # site = Website.query.all()
-    print(f"This was found in the db {site.longUrl}")
-    # longUrl = site.longUrl
-    return redirect(site.longUrl)
+    longUrl = site.longUrl
+    splitUrl = longUrl.split(":")
+    print (splitUrl)
+    if splitUrl[0] != "https" and splitUrl[0] != "http" :
+        longUrl = "http://" + longUrl
+        print(longUrl)
 
-# from flask import Flask, request, render_template, redirect
-# from utils import *
-# app = Flask(__name__)
-# @app.route('/', methods=["GET", "POST"])
-# def index():
-#     if request.method == "POST":
-#         short_name = request.form.get('name')
-#         url = request.form.get('url')
-#         if 'http' not in url:
-#             url = f'http://{url}'
-#             if valid_url(url):      
-#                 if name_available(short_name) is None:
-#                     add_url(short_name, url)
-#                     return render_template("success.html", short_name=short_name)
-#                 else:
-#                     return render_template('index.html', msg='Short name not available')
-#         else:
-#             return render_template('index.html', msg='Invalid url')
-#         return render_template('index.html')
-
-# @app.route('/<path:short_name>')
-# def redirect_url(short_name):
-#     url = get_url(short_name)
-#     if url is None:
-#         return "<h2 style='color:red'> Invalid URL </h2>"
-#     return redirect(url.url)
+    return redirect(longUrl)
