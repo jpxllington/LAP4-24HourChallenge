@@ -18,8 +18,7 @@ class Website(db.Model):
     longUrl = db.Column(db.String(500), unique=True, nullable=False)
     shortUrl = db.Column(db.String(10), unique=True, nullable=False)
 
-    # def __repr__(self):
-    #     return f"UrlModel('{self.longUrl}', '{self.shortUrl}')"
+    
     def __repr__(self):
         longUrl = self.longUrl 
         shortUrl = self.shortUrl 
