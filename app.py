@@ -1,11 +1,12 @@
 from flask import Flask, render_template, request, redirect
 import shortuuid
-from werkzeug import werkzeug
+
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////website.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///website.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 @app.before_first_request
@@ -22,9 +23,12 @@ class Website(db.Model):
         self.shortUrl = shortUrl
     
 
+def init_db():
+    db.create_all()
+
 @app.route('/', methods=["GET","POST"])
 def index():
-    if request.method== "GET":
+    if request.method == "GET":
         return render_template("home.html")
     elif request.method == "POST":
         requestUrl = request.get_json()
@@ -32,5 +36,3 @@ def index():
         site = Website(longUrl=requestUrl, shortUrl=shortUrl)
         return render_template("home.html", shortUrl=shortUrl)
         
-
-

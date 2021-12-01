@@ -14,4 +14,6 @@ flask-sqlalchemy = "*"
 
 [requires]
 python_version = "3.10"
+
+[scripts]
 dev = "bash -c \"export FLASK_ENV='development' && flask run\""
