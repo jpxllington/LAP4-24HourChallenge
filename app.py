@@ -34,19 +34,21 @@ def index():
         return render_template("home.html")
     elif request.method == "POST":
         requestUrl = request.form['URL']
-        try:
-            existing = Website.query.filter_by(longUrl=requestUrl).first()
-            if existing.longUrl:
-                return render_template("home.html", shortUrl=existing.shortUrl)
-        except:
+        if len(requestUrl) > 6:
+            try:
+                existing = Website.query.filter_by(longUrl=requestUrl).first()
+                if existing.longUrl:
+                    return render_template("home.html", shortUrl=existing.shortUrl)
+            except:
+                shortUrl = shortuuid.uuid()[:10]
+                site = Website(longUrl=requestUrl, shortUrl=shortUrl)
+                print(site.longUrl)
+                print(site.shortUrl)
+                db.session.add(site)
+                db.session.commit()
+                return render_template("home.html", shortUrl=shortUrl)
+        else:
             return ("<h1>Please enter a URL</h1>")
-        shortUrl = shortuuid.uuid()[:10]
-        site = Website(longUrl=requestUrl, shortUrl=shortUrl)
-        print(site.longUrl)
-        print(site.shortUrl)
-        db.session.add(site)
-        db.session.commit()
-        return render_template("home.html", shortUrl=shortUrl)
         
 
 @app.route('/<string:shortUrl>', methods=["GET"])
